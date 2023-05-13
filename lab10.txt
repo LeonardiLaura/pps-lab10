@@ -1,0 +1,212 @@
+succ(N, s(N)).
+
+sum(zero, N, N).
+sum(s(M), N, s(O)) :- sum(M, N, O).
+
+
+mul(zero, N, zero).
+mul(s(M), N, O2) :- mul(M, N, O), sum(O, N, O2).
+
+dec(s(N), N).
+
+factorial(zero, s(zero)).
+factorial(s(N), O2) :- factorial(N, O), mul(O, s(N), O2).
+
+greater(s(_), zero). 
+greater(s(M), s(N)) :- greater(M, N).
+
+range(A,B,A).
+range(A,B,C):- range(s(A),B,C).
+
+
+find(cons(E,_),E).
+find(cons(_,T),E):- find(T,E).
+
+position(cons(E,_),zero,E).
+position(cons(_,T),s(N),E):- position(T,N,E).
+
+concat(nil,L,L).
+concat(cons(H,T),L,cons(H,O)):- concat(T,L,O).
+
+search (X , cons (X , _)).
+search (X , cons (_ , Xs )) :- search (X , Xs ).
+
+
+
+search2 (X , cons (X , cons (X , _)) ).
+search2 (X , cons (_ , Xs ) ) :- search2 (X , Xs ) .
+
+
+search_two(X,cons(X,cons(_,cons(X,_)))).
+search_two(X,cons(_,Xs)):- search_two(X , Xs ).
+
+
+search_anytwo(X,cons(X,T)):- search(X,T).
+search_anytwo(X,cons(_,T)):- search_anytwo(X,T).
+
+size(nil,zero).
+size(cons(H,T),s(N)):- size(T,N).
+
+sum_list(nil,zero).
+sum_list(cons(H,T),R):- sum_list(T,Rs), sum(Rs,H,R).
+
+
+count(L,E,N):-count(L,E,zero,N).
+count(nil,E,N,N).
+count(cons(E,L),E,N,M):-count(L,E,s(N),M).
+count (cons(E,L),Es,N,M):-E\=Es,count(L,Es,N,M).
+
+
+
+max(cons(H,T),M):-max(T,H,M).
+max(nil,M,M).
+max(cons(H,T),Mt,M):- greater(H,Mt), max(T,H,M).
+max(cons(H,T),Mt,M):- greater(Mt,H), max(T,Mt,M).
+max(cons(H,T),Mt,M):- H=Mt, max(T,Mt,M).
+
+
+min_max(cons(H,T),Ma,Mi):-min_max(T,H,H,Ma,Mi).
+min_max(nil,Ma,Mi,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- greater(H,Mat), min_max(T,H,Mit,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- greater(Mit,H), min_max(T,Mat,H,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- greater(Mit,H), min_max(T,Mat,H,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- greater(H,Mit), greater(Mat,H) , min_max(T,Mat,Mit,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- H=Mat, min_max(T,Mat,Mit,Ma,Mi).
+min_max(cons(H,T),Mat,Mit,Ma,Mi):- H=Mit, H\=Mat, min_max(T,Mat,Mit,Ma,Mi).
+
+% same (List1 , List2 )
+% are the two lists exactly the same ?
+same(nil,nil).
+same(cons(H,T),cons(Hs,Ts)):- H=Hs, same(T,Ts).
+
+% all_bigger (List1 , List2 )
+% all elements in List1 are bigger than those in List2 ,1 by 1
+
+all_bigger(nil,nil).
+all_bigger(cons(H,T),cons(Hs,Ts)):- greater(H,Hs), all_bigger(T,Ts).
+
+
+sublist(cons(H1,T1) , L2):- search(H1,L2), sublist(T1,L2).
+sublist(nil,L2).
+
+seq( zero , _ , nil ).
+seq(s(N) , E , cons (E ,T )):- seq (N , E , T).
+
+seqR( zero , nil ).
+seqR(s(N) , cons (N ,T )):- seqR (N , T).
+
+seqR2( zero, N , nil ).
+seqR2(N , L):- seqR2 (N, zero , L).
+seqR2(s(N), E , cons (E ,T )):- seqR2 (N, s(E) , T).
+
+
+%last(L, X) X è l'ultimo elemento di L, ovvero l'elemento prima di nil.
+%non accetta liste vuote
+%usage:
+%last(cons(zero, cons(s(zero), cons(s(s(zero)), nil))), s(s(zero)))
+
+last(cons(H,(nil)),H).
+last(cons(H,T), X):- last(T,X).
+
+
+% mapInc(L1,L2). L2 è una lista i cui elementi sono gli stessi di L1 incrementati di 1
+%usage:
+%mapInc(cons(zero, cons(s(zero), cons(s(s(zero)), nil))), cons(s(zero), cons(s(s(zero)), cons(s(s(s(zero))), nil))))
+
+mapInc(nil,nil).
+mapInc(cons(H1,T1), cons(H2,T2)):- mapInc(T1,T2), s(H1)=H2.
+
+
+%filterPositive(L1,L2). L2 è una lista costituita dai soli elementi positivi di L1 (zero escluso)
+%usage:
+%filterPositive(cons(zero, cons(s(zero), cons(s(s(zero)), nil))), cons(s(zero), cons(s(s(zero)), nil))).
+
+filterPositive(nil,nil).
+filterPositive(cons(H,T),cons(H,T2)):- greater(H,zero), filterPositive(T,T2).
+filterPositive(cons(H,T),L):- H=zero, filterPositive(T,L).
+
+
+% countPositive(L, N) N è il numero di elementi maggiori di 0 presenti in L
+%usage:
+%countPositive(cons(zero, cons(s(zero), cons(s(s(zero)), nil))), s(s(zero))).
+
+countPositive(nil, zero).
+countPositive(cons(H,T),s(N)):- greater(H,zero), countPositive(T,N).
+countPositive(cons(H,T),N):- H=zero, countPositive(T,N).
+
+%findPositive(L,N) N è il primo elemento >0 in L
+%usage:
+%findPositive(cons(zero, cons(s(zero), cons(s(s(zero)), nil))), s(zero))
+
+findPositive(nil,nil).
+findPositive(cons(s(H),T),s(H)).
+findPositive(cons(H,T),N):- H=zero, findPositive(T,N).
+
+% dropLast2(L1,L2) L2 è L1 senza gli ultimi due elementi prima di nil
+%usage:
+%dropLast2(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))), cons(zero, cons(s(zero), nil)))
+
+dropLast2(cons(_,cons(_,nil)),nil).
+dropLast2(cons(H1,T1),cons(H1,T2)):- dropLast2(T1,T2).
+
+
+%dropUntilZero(L1,L2) L2 è L1 senza il prefisso più lungo costituito da elementi maggiori di 0
+%usage:
+%dropUntilZero(cons(s(zero), cons(zero, cons(s(zero), cons(s(s(zero)), nil)))), cons(zero, cons(s(zero), cons(s(s(zero)), nil))))
+
+
+dropUntilZero(cons(zero,T),cons(zero,T)).
+dropUntilZero(cons(H,T),L):- greater(H,zero), dropUntilZero(T,L).
+
+
+% l partition (_>0) L2 sono gli elementi di L1>0, L3 i restanti
+%usage:
+%partitionZero(cons(s(zero), cons(zero, cons(s(s(zero)), cons(zero, nil)))), cons(s(zero), cons(s(s(zero)), nil)), cons(zero, cons(zero, nil)))
+% si blocca nel caso: partitionZero(X, Y, cons(zero, cons(zero, nil)))
+
+partitionZero(nil,nil,nil).
+partitionZero(cons(H1,T1),cons(H1,T2),L):- greater(H1,zero), partitionZero(T1,T2,L).
+partitionZero(cons(H1,T1),L,cons(H1,T2)):- H1=zero, partitionZero(T1,L,T2).
+
+
+% reversed(L1,L2) L2 contiene gli elementi di L1 ma in posizione inversa
+%usage:
+%reversed(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))), cons(s(s(zero)), cons(s(zero), cons(s(zero), cons(zero, nil)))))
+
+%si blocca dopo aver dato il risultato corretto nel caso:
+% reversed(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))),X)
+
+dropLast(cons(_,nil),nil).
+dropLast(cons(H1,T1),cons(H1,T2)):- dropLast(T1,T2).
+reversed(nil,nil).
+reversed(cons(H,T),L):- last(L,E), E=H,dropLast(L,Lnew), reversed(T,Lnew).
+
+%si blocca nel caso reversed(X,cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))))
+
+%reversedok(nil,L).
+%reversed(L1,L2):- reversed(L1,L2,nil).
+%reversed(cons(H,T),L2,L3):- reversed(T,L2,cons(H,L3)).
+%reversed(nil,L,L):- reversedok(nil,L).
+
+
+% dropFirst2(L1,L2) L2 è L1 senza i primi 2 elementi, L1 deve avere almeno due elementi
+%usage:
+%dropFirst2(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))), cons(s(zero), cons(s(s(zero)), nil)))
+
+dropFirst2(cons(_,cons(_,T)),T).
+
+% takeFirst2(L1,L2) L2 è costituito dai primi due elementi di L1,  L1 deve avere almeno due elementi
+%usage:
+%takeFirst2(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))), cons(zero, cons(s(zero), nil)))
+
+takeFirst2(cons(E1,cons(E2,T)),cons(E1,cons(E2,nil))).
+
+% zip(L1,L2,L3) L3 è costituita dalle tuple degli elementi di L1 e L2 accoppiati uno a uno
+%usage:
+%zip(cons(zero, cons(s(zero), cons(s(zero), cons(s(s(zero)), nil)))), cons(s(zero), cons(zero, cons(s(s(zero)), cons(zero, nil)))), cons(cons(zero, s(zero)), cons(cons(s(zero), zero), cons(cons(s(zero), s(s(zero))), cons(cons(s(s(zero)), zero), nil)))))
+
+zip(nil,nil,nil).
+zip(cons(H1,T1),cons(H2,T2),cons(cons(H1,H2),T)):- zip(T1,T2,T).
+
+
+
